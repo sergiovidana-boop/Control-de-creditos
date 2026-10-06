@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Créditos y Pagos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 min-h-screen">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+    
+    <!-- Encabezado -->
+    <div class="bg-white p-5 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Control de Pagos y Préstamos</h1>
+        <p class="text-sm text-slate-500">Seguimiento de cuotas activas y fechas de cobro</p>
+      </div>
+      <button onclick="solicitarNotificaciones()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm">
+        🔔 Activar Recordatorios
+      </button>
+    </div>
+
+    <!-- Contenedor de Tarjetas por Persona/Crédito -->
+    <div id="creditos-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+  </div>
+
+  <script>
+    // Datos extraídos de tu tabla Excel
+    const creditosData = [
+      {
+        persona: "Maribel",
+        titulo: "BBVA 17-Nov-25",
+        montoTotal: 12000,
+        pagos: [
+          { num: 1, fecha: "2026-01-04", monto: 532.59, pagado: true },
+          { num: 2, fecha: "2026-02-04", monto: 532.59, pagado: true },
+          { num: 3, fecha: "2026-03-04", monto: 532.59, pagado: true },
+          { num: 4, fecha: "2026-04-04", monto: 532.59, pagado: true },
+          { num: 5, fecha: "2026-05-04", monto: 532.59, pagado: true },
+          { num: 6, fecha: "2026-06-04", monto: 532.59, pagado: true },
+          { num: 7, fecha: "2026-07-04", monto: 532.59, pagado: true },
+          { num: 8, fecha: "2026-08-04", monto: 532.59, pagado: true },
+          { num: 9, fecha: "2026-09-04", monto: 532.59, pagado: true },
+          { num: 10, fecha: "2026-10-04", monto: 532.59, pagado: false },
+          { num: 11, fecha: "2026-11-04", monto: 532.59, pagado: false }
+        ]
+      },
+      {
+        persona: "Maribel",
+        titulo: "MeLi 6-Abr",
+        montoTotal: 6000,
+        pagos: [
+          { num: 1, fecha: "2026-05-01", monto: 1164.36, pagado: true },
+          { num: 2, fecha: "2026-06-01", monto: 1164.36, pagado: true },
+          { num: 3, fecha: "2026-07-01", monto: 1164.36, pagado: true },
+          { num: 4, fecha: "2026-08-01", monto: 1164.36, pagado: true },
+          { num: 5, fecha: "2026-09-01", monto: 1164.36, pagado: false },
+          { num: 6, fecha: "2026-10-01", monto: 1164.36, pagado: false }
+        ]
+      },
+      {
+        persona: "Esmeralda",
+        titulo: "MeLi 15-Jun-26",
+        montoTotal: 30000,
+        pagos: [
+          { num: 1, fecha: "2026-07-01", monto: 5614.84, pagado: true },
+          { num: 2, fecha: "2026-08-01", monto: 5614.84, pagado: true },
+          { num: 3, fecha: "2026-09-01", monto: 5614.84, pagado: true },
+          { num: 4, fecha: "2026-10-01", monto: 5614.84, pagado: false },
+          { num: 5, fecha: "2026-11-01", monto: 5614.84, pagado: false }
+        ]
+      },
+      {
+        persona: "Tomy",
+        titulo: "DIDI 17-Sep-26",
+        montoTotal: 6000,
+        pagos: [
+          { num: 1, fecha: "2026-10-02", monto: 1148.47, pagado: false },
+          { num: 2, fecha: "2026-10-16", monto: 1148.47, pagado: false },
+          { num: 3, fecha: "2026-10-30", monto: 1148.47, pagado: false }
+        ]
+      }
+    ];
+
+    function renderizarCreditos() {
+      const container = document.getElementById('creditos-container');
+      container.innerHTML = '';
+
+      creditosData.forEach(credito => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden";
+
+        let htmlPagos = credito.pagos.map(pago => {
+          const bgClass = pago.pagado 
+            ? 'bg-slate-50 text-slate-400 border-l-4 border-slate-300' 
+            : 'bg-yellow-50 text-slate-800 border-l-4 border-yellow-400 font-semibold';
+          
+          return `
+            <div class="flex justify-between items-center p-3 rounded-lg text-sm ${bgClass}">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 flex items-center justify-center rounded-full bg-slate-200 text-xs text-slate-600">${pago.num}</span>
+                <span>${pago.fecha}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span>$${pago.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                <input type="checkbox" ${pago.pagado ? 'checked' : ''} class="w-4 h-4 accent-indigo-600 rounded">
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        card.innerHTML = `
+          <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">${credito.persona}</span>
+              <h3 class="font-bold text-slate-800">${credito.titulo}</h3>
+            </div>
+            <span class="text-sm font-semibold text-slate-600">$${credito.montoTotal.toLocaleString('es-MX')}</span>
+          </div>
+          <div class="p-4 space-y-2 max-h-60 overflow-y-auto">
+            ${htmlPagos}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function solicitarNotificaciones() {
+      if (!("Notification" in window)) {
+        alert("Este navegador no soporta notificaciones.");
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          new Notification("Recordatorios Activados", {
+            body: "Te avisaremos cuando tengas cuotas próximas a vencer.",
+            icon: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
+          });
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderizarCreditos);
+  </script>
+</body>
+</html>
